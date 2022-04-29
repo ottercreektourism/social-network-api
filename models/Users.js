@@ -14,19 +14,29 @@ const UsersSchema = new Schema(
             unique: true,
             match: /^([a-z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,6})$/
         },
-        thoughts: {
-            type: Schema.Types.ObjectId,
-            ref: 'Thoughts'
+        thoughts: [
+            {
+                type: Schema.Types.ObjectId,
+                ref: 'Thoughts'
 
+            },
+        ],
+        friends: [
+            {
+                type: Schema.Types.ObjectId,
+                ref: 'Users'
+            },
+        ],
+    },
+    {
+        toJSON: {
+          virtuals: true,
         },
-        friends: {
-            type: Schema.Types.ObjectId,
-            ref: 'Users'
-        }
-    }
+        id: false,
+      }
 )
 
-UsersSchema.virtual("friendCount").get(function(){
+UsersSchema.virtual("friendCount").get(function () {
     return this.friends.length
 })
 
