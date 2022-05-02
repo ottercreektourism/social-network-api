@@ -7,6 +7,6 @@ router
   .route('/:thoughtId')
   .get(getThoughtById)
   .put(updateThought)
-  .delete(deleteThought);
+  .delete(deleteThoughtById);
 
 module.exports = router;
