@@ -3,6 +3,10 @@ const {Users} = require('../models');
 
 const usersController = {
     // TODO: create new user
+
+    createUsers() {
+
+    },
     // TODO: get all users
     // TODO: get user by id
     getUserById({params}, res) {

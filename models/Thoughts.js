@@ -1,6 +1,6 @@
 const { Schema, model } = require('mongoose');
 
-const ReactionSchema = require('./Reaction');
+const ReactionSchema = require('./Reactions');
 // TODO: make utils
 const dateFormat = require('../utils/dateFormat')
 
@@ -37,6 +37,7 @@ ThoughtSchema.virtual("reactionCount").get(function () {
     return this.reactions.length
 })
 
-const Thoughts = model('thoughts', ThoughtSchema);
+// TODO: should it be mongoose.model( instead?
+const Thoughts = model('Thoughts', ThoughtSchema);
 
 module.exports = Thoughts;
