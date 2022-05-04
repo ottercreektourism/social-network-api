@@ -1,12 +1,13 @@
-const { Schema, model} = require('mongoose');
+const { Schema, model } = require('mongoose');
 
 const ReactionSchema = new Schema(
     {
         reactionID: {
             type: Schema.Types.ObjectId,
-            default: ()=>new Types.ObjectId()
-        }, 
+            default: () => new Types.ObjectId()
+        },
         reactionBody: {
+            // Don't have to say DataType.String because the "string" is defined by JS. So it doesnt have to be pulled in and defined manually by our use of mongoose.
             type: String,
             required: true,
             minlength: 1,
@@ -14,7 +15,7 @@ const ReactionSchema = new Schema(
         },
         username: {
             type: String,
-            required: true, 
+            required: true,
         },
         createdAt: {
             type: Date,

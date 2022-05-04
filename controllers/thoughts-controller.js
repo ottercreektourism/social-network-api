@@ -2,17 +2,17 @@
 const { Thoughts, Users } = require('../models');
 
 const thoughtsController = {
+
     // Add new thought
     addThought({ params, body }, res) {
         Thoughts.create(body)
             .then(({ _id }) => {
                 return Users.findOneAndUpdate(
                     { _id: params.userId },
-                    { $push: { thoughts: _id } },
-                    // TODO: Do we need to run validators?
+                    { $push: { thoughts: params.thoughtId } },
                     { new: true, runValidators: true }
                 ).then(thoughts => {
-                    if(!thoughts) {
+                    if (!thoughts) {
                         return res.status(404).json({ message: "not added" });
                     }
                     return res.json(thoughts);
@@ -23,32 +23,35 @@ const thoughtsController = {
 
     // Get all thoughts
     getThoughts(req, res) {
-        Thoughts.find()
+        Thoughts.find({})
             .then((thoughts) => res.json(thoughts))
             .catch((err) => res.status(500).json(err));
     },
 
 
-    // Get thought by id
-    getThoughtsById({ params }, res) {
-        Thoughts.findOne({ thoughtId })
+    // TODO: Get thought by id
+    getThoughtById({ params }, res) {
+        Thoughts.findOne({ _id: params.thoughtId })
+            .select('-__v')
+            .then((thoughts) => res.json(thoughts))
+            .catch((err) => res.status(500).json(err));
     },
+
 
     // Update thought by id
     updateThoughtById({ params, body }, res) {
         Thoughts.findOneAndUpdate(
             { _id: params.thoughtId },
-            // TODO: needs body too?
+            { $set: body },
             { new: true, runValidators: true }
-        )
-            // TODO: needs .select('-__v')?
-            .then((thoughts) => {
-                if (!thoughts) {
-                    return res.status(404).json({ message: 'No thought with that ID' })
-                }
-                return res.json(thoughts);
-            })
+        ).then((thoughts) => {
+            if (!thoughts) {
+                return res.status(404).json({ message: 'No thought with that ID' })
+            }
+            return res.json(thoughts);
+        })
     },
+
 
     // Delete thought by id
     deleteThoughtById({ params }, res) {
@@ -60,8 +63,7 @@ const thoughtsController = {
                 return Users.findOneAndUpdate(
                     { thoughts: params.thoughtId },
                     { $pull: { thoughts: params.thoughtId } },
-                    // TODO: needs validators?
-                    { new: true }
+                    { new: true, runValidators: true }
                 )
             }).then((thoughts) => {
                 if (!thoughts) {
@@ -71,6 +73,7 @@ const thoughtsController = {
             })
     },
 
+    
     // Add reaction
     addReaction({ params, body }, res) {
         Thoughts.findOneAndUpdate(
@@ -90,11 +93,8 @@ const thoughtsController = {
     deleteReaction({ params }, res) {
         Thoughts.findOneAndDelete(
             { _id: params.thoughtId },
-            // TODO: should it be body or params since this is delete?
-            // TODO: maybe make something with a reactionsId
-            { $pull: { reactions: body } },
-            // TODO: make sure this is true, not sure since I'm not adding a new thing to this
-            { new: true }
+            { $pull: { reactions: { reactionId: params.reactionId } } },
+            { new: true, runValidators: true }
         ).then((thoughts) => {
             if (!thoughts) {
                 return res.status(404).json({ message: "no thoughts with that ID" })
