@@ -4,7 +4,7 @@ const { Users, Thoughts } = require('../models');
 const usersController = {
 
     // Create new user
-     // POST /api/users
+    // POST /api/users
     createUser({ body }, res) {
         Users.create(body)
             .then(userData => {

@@ -1,6 +1,6 @@
 const router = require('express').Router();
 
-// TODO: require all of the routes from the thoughts controller
+// Require all of the routes from the thoughts controller
 const {
     addThought,
     getThoughts,

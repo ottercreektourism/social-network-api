@@ -4,35 +4,55 @@ const { Thoughts, Users } = require('../models');
 const thoughtsController = {
 
     // Add new thought
-    // GET /api/thoughts
+    //POST /api/thoughts
+    // TODO: not added error
+    // addThought({ params, body }, res) {
+    //     Thoughts.create(body)
+    //         // TODO: unread value
+    //         .then(thoughts => {
+    //             Users.findOneAndUpdate(
+    //                 { _id: params.userId },
+    //                 { $push: { thoughts: thoughts.thoughtId } },
+    //                 { new: true, runValidators: true }
+    //             )
+    //             return res.json(thoughts);
+    //         })
+    //         .catch(err => res.json(err));
+    // },
+
     addThought({ params, body }, res) {
         Thoughts.create(body)
-        // TODO: unread value
-            .then(({ _id }) => {
-                return Users.findOneAndUpdate(
-                    { _id: params.userId },
-                    { $push: { thoughts: params.thoughtId } },
-                    { new: true, runValidators: true }
-                ).then(thoughts => {
-                    if (!thoughts) {
-                        return res.status(404).json({ message: "not added" });
-                    }
-                    return res.json(thoughts);
-                })
+        .then(thoughts => {
+            Users.findOneAndUpdate(
+                { _id: params.userId },
+                { $push: { thoughts: thoughts._id } },
+                { new: true }
+            )
+            .then(thoughts => {
+                if (!thoughts) {
+                    res.status(404).json({ message: 'No user found with this id' });
+                    return;
+                }
+                res.json(thoughts);
             })
+            .catch(err => res.json(err));
+        })
+        .catch(err => res.status(400).json(err));
     },
 
 
     // Get all thoughts
     // GET /api/thoughts
+    // TODO: 500 internal server error
     getThoughts(req, res) {
         Thoughts.find({})
+            .select('-__v')
             .then((thoughts) => res.json(thoughts))
             .catch((err) => res.status(500).json(err));
     },
 
 
-    // TODO: Get thought by id
+    // Get thought by id
     // GET /api/thoughts/:thoughtId
     getThoughtById({ params }, res) {
         Thoughts.findOne({ _id: params.thoughtId })
@@ -79,7 +99,7 @@ const thoughtsController = {
             })
     },
 
-    
+
     // Add reaction
     // POST /api/thoughts/:thoughtId/reactions
     addReaction({ params, body }, res) {

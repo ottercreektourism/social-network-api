@@ -20,7 +20,7 @@ const ReactionSchema = new Schema(
         createdAt: {
             type: Date,
             default: Date.now,
-            // TODO: dateFormat will be imported (in utils?)
+            // TODO:  will be imported (in utils?)
             get: timestamp => dateFormat(timestamp)
         }
     }
