@@ -1,9 +1,6 @@
 // Require mongoose
 const mongoose = require('mongoose');
 
-// TODO: not sure where to put these two things
-// app.use(express.static('public'));
-
 // Connect mongoose
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://127.0.0.1/social-network-api', {
   // Flag to use a new-style parser (as opposed to the old one) for when it parses urls

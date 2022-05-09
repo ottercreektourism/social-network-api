@@ -5,39 +5,23 @@ const thoughtsController = {
 
     // Add new thought
     //POST /api/thoughts
-    // TODO: not added error
-    // addThought({ params, body }, res) {
-    //     Thoughts.create(body)
-    //         // TODO: unread value
-    //         .then(thoughts => {
-    //             Users.findOneAndUpdate(
-    //                 { _id: params.userId },
-    //                 { $push: { thoughts: thoughts.thoughtId } },
-    //                 { new: true, runValidators: true }
-    //             )
-    //             return res.json(thoughts);
-    //         })
-    //         .catch(err => res.json(err));
-    // },
-
-    addThought({ params, body }, res) {
+    addThought({ body }, res) {
         Thoughts.create(body)
-        .then(thoughts => {
-            Users.findOneAndUpdate(
-                { _id: params.userId },
-                { $push: { thoughts: thoughts._id } },
-                { new: true }
-            )
             .then(thoughts => {
-                if (!thoughts) {
-                    res.status(404).json({ message: 'No user found with this id' });
-                    return;
-                }
-                res.json(thoughts);
+                console.log(body.userId);
+                return Users.findOneAndUpdate(
+                    { _id: body.userId },
+                    { $push: { thoughts: thoughts._id } },
+                    { new: true }
+                )
+                    .then(thoughts => {
+                        if (!thoughts) {
+                            res.status(404).json({ message: 'No user found with this id' });
+                            return;
+                        }
+                        return res.json(thoughts);
+                    })
             })
-            .catch(err => res.json(err));
-        })
-        .catch(err => res.status(400).json(err));
     },
 
 
@@ -82,20 +66,19 @@ const thoughtsController = {
     // DELETE /api/thoughts/:thoughtId
     deleteThoughtById({ params }, res) {
         Thoughts.findOneAndRemove({ _id: params.thoughtId })
-            .then((thoughts) => {
+            .then(thoughts => {
                 if (!thoughts) {
-                    return res.status(404).json({ message: "no thought found" });
+                    res.status(404).json({ message: "no thought found" });
+                    return;
                 }
-                return Users.findOneAndUpdate(
+                Users.findOneAndUpdate(
+                    // TODO: trying to delete the thought from the user's thought array too. which of these lines do I use?
                     { thoughts: params.thoughtId },
+                    // { username: thoughts.username },
                     { $pull: { thoughts: params.thoughtId } },
                     { new: true, runValidators: true }
-                )
-            }).then((thoughts) => {
-                if (!thoughts) {
-                    return res.status(404).json({ message: "not deleted" });
-                }
-                return res.json({ message: "successfully deleted" });
+                ).then(() => res.json({ message: 'Successfully deleted the thought' }))
+                .catch((err) => res.status(500).json(err));
             })
     },
 
@@ -117,11 +100,12 @@ const thoughtsController = {
 
 
     // Delete reaction by id
-    // DELETE /api/thoughts/:thoughtId/reactions
-    deleteReaction({ params }, res) {
-        Thoughts.findOneAndDelete(
+    // DELETE /api/thoughts/:thoughtId/reactions/:reactionId
+    // TODO: when I delete a reaction, it deletes all reactions to that thought
+    deleteReaction({ params, body }, res) {
+        Thoughts.findOneAndUpdate(
             { _id: params.thoughtId },
-            { $pull: { reactions: { reactionId: params.reactionId } } },
+            { $pull: { reactions: { reactionId: body.reactionId } } },
             { new: true, runValidators: true }
         ).then((thoughts) => {
             if (!thoughts) {
@@ -129,7 +113,8 @@ const thoughtsController = {
             }
             return res.json(thoughts);
         })
-    }
+    },
+
 }
 
 module.exports = thoughtsController

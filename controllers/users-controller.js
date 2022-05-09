@@ -67,27 +67,25 @@ const usersController = {
     // Delete user by id
     // DELETE /api/users/:id
     deleteUserById({ params }, res) {
+        // delete the user
         Users.findOneAndRemove(
             { _id: params.userId }
-        ).then((userData) => {
+        ).then(userData => {
             if (!userData) {
-                return res.status(404).json({ message: 'No user with that ID' })
+                res.status(404).json({ message: 'No user with that ID' });
+                return;
             }
-            return res.json(userData);
-        })
-        // Delete the user from all friend arrays that exist using $in
-        Users.updateMany(
-            { _id: { $in: userData.friends } },
-            { $pull: { friends: params.userId } }
-        ).then(() => {
-            // Delete all thoughts written by the user
-            Thoughts.deleteMany(
-                { username: UserData.username }
-            ).then((userData) => {
-                if (!userData) {
-                    return res.status(404).json({ message: "deleted user and associated thoughts." })
-                }
-                return res.json(userData);
+            // Delete the user from all friend arrays that exist using $in
+            Users.updateMany(
+                { _id: { $in: userData.friends } },
+                { $pull: { friends: params.userId } }
+            ).then(() => {
+                // Delete all thoughts written by the user
+                Thoughts.deleteMany(
+                    { username: userData.username }
+                ).then(() => {
+                    res.json({ message: "deleted user and associated thoughts." });
+                })
             })
         })
     },
@@ -123,8 +121,8 @@ const usersController = {
 
     // Delete friend by id
     // DELETE /api/users/:userId/friends/:friendId
-    deleteFriendById({ params }) {
-        Users.findOneAndRemove(
+    deleteFriendById({ params }, res) {
+        Users.findOneAndUpdate(
             // Delete the friendId from the userId's friend list
             { _id: params.userId },
             { $pull: { friends: params.friendId } },
