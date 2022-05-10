@@ -27,7 +27,6 @@ const thoughtsController = {
 
     // Get all thoughts
     // GET /api/thoughts
-    // TODO: 500 internal server error
     getThoughts(req, res) {
         Thoughts.find({})
             .select('-__v')
@@ -101,7 +100,6 @@ const thoughtsController = {
 
     // Delete reaction by id
     // DELETE /api/thoughts/:thoughtId/reactions/:reactionId
-    // TODO: when I delete a reaction, it deletes all reactions to that thought
     deleteReaction({ params, body }, res) {
         Thoughts.findOneAndUpdate(
             { _id: params.thoughtId },

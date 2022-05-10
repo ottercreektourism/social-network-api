@@ -1,9 +1,5 @@
 const express = require('express');
 const db = require('./config/connection');
-const helpers = require('./utils/helpers');
-
-// Importing Reactions, Thoughts and Users models.
-const { Reactions, Thoughts, Users } = require('./models');
 
 
 const PORT = process.env.PORT || 3001;

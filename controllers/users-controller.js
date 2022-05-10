@@ -52,7 +52,7 @@ const usersController = {
     // PUT /api/users/:id
     updateUserById({ params, body }, res) {
         Users.findOneAndUpdate(
-            { _id: params.UserId },
+            { _id: params.userId },
             { $set: body },
             { new: true, runValidators: true }
         ).then((userData) => {
